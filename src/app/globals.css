@@ -1,26 +1,91 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a1128;
+  --surface: #101a35;
+  --surface-elevated: #16223f;
+  --foreground: #eef1f8;
+  --muted: #93a0c0;
+  --border: #223057;
+  --gold: #d4af37;
+  --gold-soft: #e8cd7a;
+  --gold-dark: #8f6f1d;
+  --danger: #c0453a;
+  --success: #4f8f5f;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-gold-dark: var(--gold-dark);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-oswald);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  background-image:
+    linear-gradient(rgba(212, 175, 55, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 175, 55, 0.045) 1px, transparent 1px);
+  background-size: 44px 44px;
+  background-position: center top;
+}
+
+::selection {
+  background-color: var(--gold);
+  color: #14120a;
+}
+
+.font-heading {
+  font-family: var(--font-heading), var(--font-sans), system-ui, sans-serif;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(120deg, var(--gold-soft), var(--gold) 45%, var(--gold-dark));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.steel-border {
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.rivet-corners {
+  position: relative;
+}
+
+.rivet-corners::before,
+.rivet-corners::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--gold-dark);
+  opacity: 0.6;
+  top: 10px;
+}
+
+.rivet-corners::before {
+  left: 10px;
+}
+
+.rivet-corners::after {
+  right: 10px;
 }

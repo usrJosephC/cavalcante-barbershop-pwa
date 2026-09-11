@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  COMPLETED
+  CANCELED
+  NO_SHOW
+}
+
+enum SubscriberRole {
+  CLIENT
+  ADMIN
+}
+
+/// Conta de acesso ao painel administrativo (gerente/dono da barbearia).
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+}
+
+/// Barbeiro que atende na unidade. Cadastrado pelo admin; o cliente escolhe
+/// o barbeiro de preferência ao agendar.
+model Barber {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  phone        String?
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  appointments Appointment[]
+}
+
+model Client {
+  id                String              @id @default(cuid())
+  name              String
+  phone             String              @unique
+  notes             String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  appointments      Appointment[]
+  feedbacks         Feedback[]
+  pushSubscriptions PushSubscription[]
+}
+
+model Service {
+  id              String        @id @default(cuid())
+  name            String        @unique
+  priceCents      Int
+  durationMinutes Int
+  active          Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  appointments    Appointment[]
+}
+
+model Appointment {
+  id                  String            @id @default(cuid())
+  client              Client            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId            String
+  service             Service           @relation(fields: [serviceId], references: [id])
+  serviceId           String
+  barber              Barber            @relation(fields: [barberId], references: [id])
+  barberId            String
+  startsAt            DateTime
+  endsAt              DateTime
+  status              AppointmentStatus @default(SCHEDULED)
+  /// Preço do serviço congelado no momento do agendamento (em centavos).
+  priceCentsAtBooking Int
+  notes               String?
+  reminderSentAt      DateTime?
+  /// Token opaco usado no link de cancelamento enviado ao cliente (sem necessidade de login).
+  cancelToken         String            @unique @default(cuid())
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  feedback            Feedback?
+
+  @@index([startsAt])
+  @@index([clientId])
+  @@index([status])
+  @@index([barberId])
+}
+
+model Feedback {
+  id            String      @id @default(cuid())
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  appointmentId String      @unique
+  client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId      String
+  rating        Int
+  comment       String?
+  createdAt     DateTime    @default(now())
+
+  @@index([clientId])
+}
+
+model PushSubscription {
+  id        String         @id @default(cuid())
+  endpoint  String         @unique
+  p256dh    String
+  auth      String
+  role      SubscriberRole
+  client    Client?        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId  String?
+  userAgent String?
+  createdAt DateTime       @default(now())
+
+  @@index([role])
+}
