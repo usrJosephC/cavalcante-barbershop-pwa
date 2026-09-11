@@ -2,8 +2,9 @@ import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
+import { resolveMigrationUrl } from "./db-url";
 
-const adapter = new PrismaPg({ connectionString: process.env.DIRECT_URL });
+const adapter = new PrismaPg({ connectionString: resolveMigrationUrl() });
 const prisma = new PrismaClient({ adapter });
 
 const SERVICES = [

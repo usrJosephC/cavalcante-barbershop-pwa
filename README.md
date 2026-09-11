@@ -161,17 +161,27 @@ Acesse `http://localhost:3000` (site do cliente) e `http://localhost:3000/admin/
 
 ---
 
-## ☁️ Deploy (Vercel + Supabase)
+## ☁️ Deploy (Vercel)
 
-1. Crie o projeto no Supabase e rode `npm run db:migrate` apontando `DATABASE_URL`/`DIRECT_URL`
-   para ele.
-2. No Vercel, importe o repositório e configure as variáveis de ambiente do `.env.example`
-   (`DATABASE_URL`, `DIRECT_URL`, `AUTH_SECRET`, `NEXT_PUBLIC_VAPID_PUBLIC_KEY`,
-   `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `CRON_SECRET`, `NEXT_PUBLIC_APP_URL`).
+Funciona com qualquer Postgres — Supabase ou a integração **Prisma Postgres** do próprio
+Vercel (gratuita, provisiona em 1 clique direto na tela de import do projeto).
+
+1. **Banco:** ao importar o repositório na Vercel, adicione a integração opcional
+   **Prisma Postgres** (aba *Storage*) — ela já injeta `DATABASE_URL` sozinha. Se preferir
+   Supabase, crie o projeto lá e configure `DATABASE_URL` (pooler, porta `6543`) e
+   `DIRECT_URL` (direta, porta `5432`) manualmente.
+2. Configure as demais variáveis de ambiente do `.env.example`: `AUTH_SECRET`,
+   `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `CRON_SECRET`,
+   `NEXT_PUBLIC_APP_URL`.
 3. O `vercel.json` já configura o Cron Job (`/api/cron/reminders`, a cada hora) — a Vercel
    envia `Authorization: Bearer <CRON_SECRET>` automaticamente.
-4. Rode o seed uma vez contra o banco de produção:
-   `DATABASE_URL=... DIRECT_URL=... SEED_ADMIN_EMAIL=... SEED_ADMIN_PASSWORD=... npm run db:seed`
+4. Depois do primeiro deploy, rode as migrations e o seed **uma vez** contra o banco de
+   produção (pegue a `DATABASE_URL` real em Project Settings → Environment Variables, ou via
+   `npx vercel env pull`):
+   ```bash
+   DATABASE_URL=... npm run db:deploy   # aplica as migrations (prisma migrate deploy)
+   DATABASE_URL=... SEED_ADMIN_EMAIL=... SEED_ADMIN_PASSWORD=... npm run db:seed
+   ```
 5. Abra o domínio da Vercel (HTTPS) no celular e use "Instalar app" para adicionar o PWA à
    tela inicial.
 
