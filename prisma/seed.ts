@@ -23,7 +23,11 @@ async function main() {
     console.log(`Serviço garantido: ${service.name}`);
   }
 
-  const defaultBarberName = process.env.SEED_ADMIN_NAME ?? "Cavalcante BarberShop";
+  // Remove qualquer barbeiro criado por engano com nome vazio (ex: SEED_ADMIN_NAME
+  // configurado como string vazia em vez de ausente) antes de garantir o barbeiro real.
+  await prisma.barber.deleteMany({ where: { name: "" } });
+
+  const defaultBarberName = process.env.SEED_ADMIN_NAME || "Cavalcante BarberShop";
   await prisma.barber.upsert({
     where: { name: defaultBarberName },
     update: {},
@@ -33,7 +37,7 @@ async function main() {
 
   const email = process.env.SEED_ADMIN_EMAIL;
   const password = process.env.SEED_ADMIN_PASSWORD;
-  const name = process.env.SEED_ADMIN_NAME ?? "Cavalcante BarberShop";
+  const name = process.env.SEED_ADMIN_NAME || "Cavalcante BarberShop";
 
   if (!email || !password) {
     console.warn(
