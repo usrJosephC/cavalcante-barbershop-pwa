@@ -23,11 +23,18 @@ async function main() {
     console.log(`Serviço garantido: ${service.name}`);
   }
 
-  // Remove qualquer barbeiro criado por engano com nome vazio (ex: SEED_ADMIN_NAME
-  // configurado como string vazia em vez de ausente) antes de garantir o barbeiro real.
-  await prisma.barber.deleteMany({ where: { name: "" } });
-
   const defaultBarberName = process.env.SEED_ADMIN_NAME || "Cavalcante BarberShop";
+
+  // Limpa barbeiros de seeds anteriores criados por engano (nome vazio, ou o nome
+  // genérico de fallback) que ficaram sem nenhum agendamento associado — nunca remove
+  // um barbeiro com histórico real ou cadastrado manualmente pelo admin.
+  await prisma.barber.deleteMany({
+    where: {
+      name: { in: ["", "Cavalcante BarberShop"] },
+      NOT: { name: defaultBarberName },
+      appointments: { none: {} },
+    },
+  });
   await prisma.barber.upsert({
     where: { name: defaultBarberName },
     update: {},
