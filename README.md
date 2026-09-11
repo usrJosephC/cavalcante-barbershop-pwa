@@ -173,7 +173,8 @@ Vercel (gratuita, provisiona em 1 clique direto na tela de import do projeto).
 2. Configure as demais variáveis de ambiente do `.env.example`: `AUTH_SECRET`,
    `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `CRON_SECRET`,
    `NEXT_PUBLIC_APP_URL`.
-3. O `vercel.json` já configura o Cron Job (`/api/cron/reminders`, a cada hora) — a Vercel
+3. O `vercel.json` já configura o Cron Job (`/api/cron/reminders`, uma vez por dia — o plano
+   Hobby da Vercel não permite crons mais frequentes) — a Vercel
    envia `Authorization: Bearer <CRON_SECRET>` automaticamente.
 4. Depois do primeiro deploy, rode as migrations e o seed **uma vez** contra o banco de
    produção (pegue a `DATABASE_URL` real em Project Settings → Environment Variables, ou via
