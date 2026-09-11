@@ -53,6 +53,11 @@ async function main() {
     return;
   }
 
+  // Este projeto tem um único admin (o dono/barbeiro responsável). Remove qualquer
+  // conta antiga (ex: e-mail digitado errado numa configuração anterior) para não deixar
+  // credenciais esquecidas ainda válidas no banco.
+  await prisma.admin.deleteMany({ where: { NOT: { email } } });
+
   const passwordHash = await bcrypt.hash(password, 12);
   await prisma.admin.upsert({
     where: { email },
